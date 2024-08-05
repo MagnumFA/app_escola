@@ -6,19 +6,16 @@
 	</div>
 </div>
 
-<style>
-	.sticky_element{
-		position: -webkit-sticky; /* Safari */
-		position: sticky;
-		top: 0;
-	}
-</style>
-
 <div class='row mt-2'>
-	<div class='col'>
+	<div class='col-10'>
 		<h5>
 			Dados Gerais
 		</h5>
+	</div>
+	<div class='col-2'>
+		<button class='btn btn-danger w-100' onclick="$('#msg_confirmacao').modal('show')">
+			<i class="bi bi-trash"></i>
+		</button>
 	</div>
 </div>
 
@@ -52,96 +49,177 @@
 	</div>
 </div>
 
-<!-- <div class='row'>
-	<div class='col'>
-		<label>Nome</label>
-		<input class='form-control' type='text' />
+<div class="modal" id='msg_confirmacao' tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-body" id='msg_confirmacao_body'>
+				<div class="row">
+					<div class="col">
+						<p>Tem certeza que deseja excluir este registro?</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-4">
+						<button class="btn btn-light w-100" onclick="$('#msg_confirmacao').modal('hide')">
+							Cancelar
+						</button>
+					</div>
+					<div class="col-4"></div>
+					<div class="col-4">
+						<button class="btn btn-primary w-100" onclick='excluir_aluno()'>
+							Sim
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
-<div class='row mt-1'>
-	<div class='col'>
-		<label>Sobrenome</label>
-		<input class='form-control' type='text' />
-	</div>
-</div> -->
- 
 <script>
-	function gera_input(item, parent){
-	
-		var row = document.createElement('div')
-		row.className = 'row mt-2'
-		
-		var col = document.createElement('div')
-		col.className = 'col'
-		
-		var label = document.createElement('label')
-		label.innerHTML = item.label_innerHTML
-		
-		var input = document.createElement('input')
-		input.type = item.type
-		input.className = 'form-control'		
-		
-		col.appendChild(label)
-		col.appendChild(input)		
-		row.appendChild(col)
-		$(parent).append(row)	
-		
+	function excluir_aluno() {
+		var id_para_excluir = ''
+		document.querySelectorAll('.input_aluno').forEach((item) => {
+			if (item.name == 'id') {
+				id_para_excluir = item.value
+			}
+		})
+
+		$.ajax({
+			url: '/exclui_aluno',
+			type: 'POST',
+			data: JSON.stringify({ id: id_para_excluir }),
+			contentType: "application/json",
+			dataType: "json",
+		}).done(function (data) {
+			$('#msg_confirmacao').modal('hide')
+
+
+			$('#alert').modal('show')
+			$('#alert_body').html(`
+				<button class="btn btn-success w-100">
+					Excluído com Sucesso!
+				</button>
+			`)
+
+			setTimeout(function () {
+				$('#alert').modal('hide')
+				navegar_form_para_table_aluno()
+				gera_table_aluno()
+			}, 2000)
+
+		})
 	}
-	
-	$( document ).ready(function() {
-	
+</script>
+
+<div class="modal" id='alert' tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-body" id='alert_body'>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+	$(document).ready(function () {
+
 		/////
 		var meus_inputs = [
 			{
+				label_innerHTML: 'ID',
+				type: 'number',
+				name: 'id',
+				input_class: 'input_aluno'
+			}, {
 				label_innerHTML: 'Nome',
-				type: 'text'
+				type: 'text',
+				name: 'nome',
+				input_class: 'input_aluno'
 			}, {
 				label_innerHTML: 'Sobrenome',
-				type: 'text'
+				type: 'text',
+				name: 'sobrenome',
+				input_class: 'input_aluno'
 			}, {
 				label_innerHTML: 'Nome do Pai',
-				type: 'text'
+				type: 'text',
+				name: 'nome_do_pai',
+				input_class: 'input_aluno'
 			}, {
 				label_innerHTML: 'Nome da Mãe',
-				type: 'text'
+				type: 'text',
+				name: 'nome_da_mae',
+				input_class: 'input_aluno'
 			}, {
 				label_innerHTML: 'Data de Nascimento',
-				type: 'date'
-			}, {		
+				type: 'date',
+				name: 'data_de_nascimento',
+				input_class: 'input_aluno'
+			}, {
 				label_innerHTML: 'Telefone',
-				type: 'text'
+				type: 'text',
+				name: 'telefone',
+				input_class: 'input_aluno'
 			}, {
 				label_innerHTML: 'CPF',
-				type: 'text'
+				type: 'text',
+				name: 'cpf',
+				input_class: 'input_aluno'
 			}
-		]	
-		
+		]
+
 		meus_inputs.forEach((item) => {
 			gera_input(item, '#form_aluno_parte_1')
 		})
 		/////
-		
+
 		/////
 		var meus_inputs = [
 			{
 				label_innerHTML: 'Logradouro',
-				type: 'text'
+				type: 'select',
+				name: 'logradouro',
+				input_class: 'input_aluno',
+				opts_arr: [
+					'rua',
+					'avenida',
+					'travessa',
+					'servidao'
+				],
+				opt_arr_innerHTML: [
+					'Rua',
+					'Avenida',
+					'Travessa',
+					'Servidão'
+				]
 			}, {
 				label_innerHTML: 'Rua',
-				type: 'text'
+				type: 'text',
+				name: 'rua',
+				input_class: 'input_aluno'
 			}, {
 				label_innerHTML: 'Bairro',
-				type: 'text'
+				type: 'text',
+				name: 'bairro',
+				input_class: 'input_aluno'
 			}, {
 				label_innerHTML: 'Cidade',
-				type: 'text'
+				type: 'text',
+				name: 'cidade',
+				input_class: 'input_aluno'
 			}, {
 				label_innerHTML: 'Estado',
-				type: 'text'
+				type: 'text',
+				name: 'estado',
+				input_class: 'input_aluno'
 			}, {
 				label_innerHTML: 'CEP',
-				type: 'text'
+				type: 'text',
+				name: 'cep',
+				input_class: 'input_aluno'
 			}
 		]
 
@@ -149,6 +227,7 @@
 			gera_input(item, '#form_aluno_parte_2')
 		})
 		/////
-		
+
 	})
+
 </script>
